@@ -105,7 +105,13 @@ def default(obj) -> Any:
     """Default serialization for well known objects."""
     if isinstance(obj, BaseModel):
         return obj.model_dump()
-    return super().default(obj)
+    if isinstance(obj, Send):
+        return {"node": obj.node, "arg": obj.arg}
+    try:
+        return obj.__dict__()
+    except:
+        pass
+    raise TypeError(f"Object of type {obj.__class__.__name__} is not JSON serializable")
 
 
 def _decode_lc_objects(value: Any) -> Any:
